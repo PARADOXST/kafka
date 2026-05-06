@@ -137,15 +137,14 @@ public class PartitionStates<S> {
     }
 
     private void update(Map<TopicPartition, S> partitionToState) {
-        LinkedHashMap<String, List<TopicPartition>> topicToPartitions = new LinkedHashMap<>();
-        for (TopicPartition tp : partitionToState.keySet()) {
-            List<TopicPartition> partitions = topicToPartitions.computeIfAbsent(tp.topic(), k -> new ArrayList<>());
-            partitions.add(tp);
+        LinkedHashMap<String, List<Map.Entry<TopicPartition, S>>> topicToPartitions = new LinkedHashMap<>();
+        for (Map.Entry<TopicPartition, S> entry : partitionToState.entrySet()) {
+            List<Map.Entry<TopicPartition, S>> partitions = topicToPartitions.computeIfAbsent(entry.getKey().topic(), k -> new ArrayList<>());
+            partitions.add(entry);
         }
-        for (Map.Entry<String, List<TopicPartition>> entry : topicToPartitions.entrySet()) {
-            for (TopicPartition tp : entry.getValue()) {
-                S state = partitionToState.get(tp);
-                map.put(tp, state);
+        for (Map.Entry<String, List<Map.Entry<TopicPartition, S>>> entry : topicToPartitions.entrySet()) {
+            for (Map.Entry<TopicPartition, S> tpEntry : entry.getValue()) {
+                map.put(tpEntry.getKey(), tpEntry.getValue());
             }
         }
     }

@@ -151,8 +151,9 @@ public class StickyTaskAssignor implements TaskAssignor {
 
         // first try and re-assign existing active tasks to clients that previously had
         // the same active task
-        for (final TaskId taskId : assignmentState.previousActiveAssignment.keySet()) {
-            final ProcessId previousClientForTask = assignmentState.previousActiveAssignment.get(taskId);
+        for (final Map.Entry<TaskId, ProcessId> entry : assignmentState.previousActiveAssignment.entrySet()) {
+            final TaskId taskId = entry.getKey();
+            final ProcessId previousClientForTask = entry.getValue();
             if (allTaskIds.contains(taskId)) {
                 if (mustPreserveActiveTaskAssignment || assignmentState.hasRoomForActiveTask(previousClientForTask, activeTasksPerThread)) {
                     assignmentState.finalizeAssignment(taskId, previousClientForTask, AssignedTask.Type.ACTIVE);
