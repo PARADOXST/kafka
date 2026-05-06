@@ -24,7 +24,7 @@ deletions=$(echo "$pr_diff" | jq -r '.deletions')
 
 total_changes=$((additions + deletions))
 if [ "$total_changes" -lt "$MAX_SIZE" ]; then
-    gh issue edit $PR_NUM --add-label $LABEL_NAME -R $GITHUB_REPOSITORY || true
+    gh issue edit $PR_NUM --add-label $LABEL_NAME -R $GITHUB_REPOSITORY
 else
-    gh issue edit $PR_NUM --remove-label $LABEL_NAME -R $GITHUB_REPOSITORY || true
+    gh issue edit $PR_NUM --remove-label $LABEL_NAME -R $GITHUB_REPOSITORY
 fi
