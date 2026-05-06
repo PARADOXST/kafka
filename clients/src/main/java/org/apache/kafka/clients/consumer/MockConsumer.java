@@ -204,20 +204,21 @@ public class MockConsumer<K, V> implements Consumer<K, V> {
         committed.clear();
         this.subscriptions.subscribe(pattern, listener);
         Set<String> topicsToSubscribe = new HashSet<>();
-        for (String topic: partitions.keySet()) {
+        final Set<TopicPartition> assignedPartitions = new HashSet<>();
+
+        for (Map.Entry<String, List<PartitionInfo>> entry : partitions.entrySet()) {
+            String topic = entry.getKey();
             if (pattern.matcher(topic).matches() &&
-                !subscriptions.subscription().contains(topic))
+                !subscriptions.subscription().contains(topic)) {
                 topicsToSubscribe.add(topic);
+                for (final PartitionInfo info : entry.getValue()) {
+                    assignedPartitions.add(new TopicPartition(topic, info.partition()));
+                }
+            }
         }
+
         ensureNotClosed();
         this.subscriptions.subscribeFromPattern(topicsToSubscribe);
-        final Set<TopicPartition> assignedPartitions = new HashSet<>();
-        for (final String topic : topicsToSubscribe) {
-            for (final PartitionInfo info : this.partitions.get(topic)) {
-                assignedPartitions.add(new TopicPartition(topic, info.partition()));
-            }
-
-        }
         subscriptions.assignFromSubscribed(assignedPartitions);
     }
 
